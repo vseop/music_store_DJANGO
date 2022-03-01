@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="col-md-12 pt-3">
+    <nav aria-label="breadcrumb">
+
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'base' %}">Главная</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ artist.name }}
+            </li>
+        </ol>
+
+    </nav>
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <img src="{{ artist.image.url }}" class="img-fluid">
+        </div>
+        <div class="col-md-8">
+
+            <h4>{{ artist.name }}</h4>
+            <hr>
+            <p>Жанр: {{ artist.genre.name }}</p>
+            <p>Участники:
+            <ul>
+                {% for member in artist.members.all %}
+                <li>{{ member.name }}</li>
+                {% endfor %}
+            </ul>
+            </p>
+
+        </div>
+
+    </div>
+
+    <h5 class="mt-3">Галерея изображений</h5>
+
+    <div class="row">
+
+        {% for item in artist.image_gallery.all %}
+
+        <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+            <img src="{{ item.image.url }}" class="w-100 shadow-1-strong rounded mb-4">
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock content %}

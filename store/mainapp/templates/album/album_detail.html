@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="col-md-12 pt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'base' %}">Главная</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'artist_detail' artist_slug=album.artist.slug %}">
+                    {{ album.artist.name }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active">
+                {{ album.name }}
+            </li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ album.image.url }}" class="img-fluid">
+        </div>
+        <div class="col-md-8">
+            <h4>{{ album.artist.name }} - {{ album.name }}</h4>
+            <hr>
+            <p>Дата выхода: {{ album.release_date|date:"d-m-Y" }}</p>
+            <p>Жанр: {{ album.artist.genre.name }}</p>
+            <p>Описание: {{ album.description }}</p>
+            <p>Наличие: {% if album.stock %}<strong class="badge bg-success">
+                Есть в наличии - {{ album.stock }} шт.</strong>{% else %}
+                <strong class="badge bg-danger">Нет в наличии</strong>{% endif %}
+            </p>
+            <div class="card-body text-center">
+
+                {% if request.user.is_authenticated %}
+
+                {% if album.stock %}
+                {% if album not in cart.products_in_cart %}
+                <a href="{% url 'add_to_cart' ct_model=album.ct_model slug=album.slug %}">
+                    <button class="btn btn-primary">
+                        Добавить в корзину
+                    </button>
+                </a>
+                {% else %}
+                <a href="#" class="btn btn-default" disabled="">Добавлен в корзину</a>
+                {% endif %}
+                {% else %}
+                {% if album not in request.user.customer.wishlist.all %}
+                <a href="{% url 'add_to_wishlist' album_id=album.id %}" class="btn btn-warning">
+                    Добавить в ожидаемое
+                </a>
+                {% else %}
+                <a href="#" class="btn btn-default" disabled="">Добавлен в ожидаемое</a>
+                {% endif %}
+                {% endif %}
+                {% else %}
+                <a href="#" class="btn btn-default" disabled="">
+                    Авторизуйтесь или зарегистрируйтесь
+                </a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

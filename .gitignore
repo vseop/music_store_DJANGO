@@ -1,0 +1,17 @@
+venv
+
+static
+
+static_dev
+
+*.pyc
+
+*__pycache__/
+
+images
+
+db.sqlite3
+
+.idea
+
+media

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h4 class="text-center">Личный кабинет</h4>
+<hr>
+<div class="row">
+    <div class="col-4">
+        <div class="list-group" id="list-tab" role="tablist">
+            <a class="list-group-item list-group-item-action active" id="list-orders-list" data-bs-toggle="list"
+               href="#list-orders"
+               role="tab" aria-controls="list-orders">Заказы</a>
+            <a class="list-group-item list-group-item-action" id="list-wishlist-list" data-bs-toggle="list" href="#list-wishlist"
+               role="tab" aria-controls="list-wishlist">Лист ожидания</a>
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="list-orders" role="tabpanel" aria-labelledby="list-orders-list">
+                <table class="table">
+
+                    <thead>
+
+                    <tr>
+                        <th scope="col">Номер заказа</th>
+                        <th scope="col">Статус</th>
+                        <th scope="col">Сумма</th>
+                        <th scope="col">Детали</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for order in customer.orders.all %}
+
+                    <tr>
+                        <th scope="row">{{ order.id }}</th>
+                        <td>{{ order.get_status_display }}</td>
+                        <td>{{ order.cart.final_price }} руб.</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#orderDetails-{{ order.id }}">Детали заказа
+                            </button>
+                        </td>
+
+
+                        <div class="modal fade" id="orderDetails-{{ order.id }}" tabindex="-1"
+                             aria-labelledby="orderDetailsLabel-{{ order.id }}" aria-hidden="true">
+
+                            <div class="modal-dialog modal-xl">
+
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-center" id="orderDetailsLabel-{{ order.id }}">
+                                            Информация о заказе #{{ order.id }}
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+
+                                            <div class="col-md-3 text-center mb-2">
+                                                <strong>Исполнитель/альбом</strong>
+                                            </div>
+                                            <div class="col-md-3 text-center mb-2">
+                                                <strong>Изображение</strong>
+                                            </div>
+                                            <div class="col-md-3 text-center mb-2">
+                                                <strong>Кол-во</strong>
+                                            </div>
+                                            <div class="col-md-3 text-center mb-2">
+                                                <strong>Общая цена</strong>
+                                            </div>
+                                            <hr>
+                                            {% for item in order.cart.products.all %}
+                                            <div class="col-md-3 mb-3 text-center">
+                                                <strong>
+                                                    <a href="{{ item.content_object.artist.get_absolute_url }}"
+                                                       class="text-decoration-none">
+                                                        {{ item.content_object.artist.name }}
+                                                    </a> - <a href="{{ item.content_object.get_absolute_url }}"
+                                                              class="text-decoration-none">
+                                                    {{ item.content_object.name }}
+                                                </a>
+                                                </strong>
+
+                                            </div>
+                                            <div class="col-md-3 mb-3 text-center">
+                                                <img src="{{ item.content_object.image.url }}" class="img-fluid">
+                                            </div>
+                                            <div class="col-md-3 mb-3 text-center">
+                                                {{ item.qty }} шт.
+                                            </div>
+                                            <div class="col-md-3 mb-3 text-center">
+                                                {{ item.final_price }} руб.
+                                            </div>
+                                            {% endfor %}
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Закрыть
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </tr>
+
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="tab-pane fade" id="list-wishlist" role="tabpanel" aria-labelledby="list-wishlist-list">
+                <div class="row">
+                    {% for album in customer.wishlist.all %}
+
+                    <div class="card col-md-4 p-0 mb-3 mt-3">
+                        <img src="{{ album.image.url }}" class="card-img-top">
+                        <div class="card-body text-center">
+                            <h5 class="card-title"><a href="{{ album.artist.get_absolute_url }}" class="text-decoration-none">
+                                {{ album.artist.name }}
+                            </a></h5>
+                            <h5 class="card-title"><a href="{{ album.get_absolute_url }}" class="text-decoration-none">
+                                {{ album.name }}
+                            </a></h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                Носитель: <strong>{{ album.media_type.name }}</strong>
+                            </li>
+                            <li class="list-group-item">
+                                Дата релиза: <strong>{{ album.release_date|date:"d-m-Y" }}</strong>
+                            </li>
+                            <li class="list-group-item">
+                                Жанр: <strong class="badge bg-dark">{{ album.artist.genre.name }}</strong>
+                            </li>
+                            <li class="list-group-item">
+                                Наличие: {% if album.stock %}<strong class="badge bg-success">
+                                Есть в наличии</strong>{% else %}
+                                <strong class="badge bg-danger">Нет в наличии</strong>{% endif %}
+                            </li>
+                        </ul>
+                        <div class="card-body text-center">
+                            <a href="{% url 'remove_from_wishlist' album_id=album.id %}"
+                               class="btn btn-danger">Удалить из ожидаемого <i class="fas fa-star"></i></a>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
