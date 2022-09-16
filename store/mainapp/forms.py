@@ -6,6 +6,7 @@ from crispy_forms.bootstrap import InlineCheckboxes
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout
 
+from django.db import connection
 from ajax_select.fields import AutoCompleteSelectField
 
 User = get_user_model()
@@ -96,14 +97,14 @@ class RegistrationForm(forms.ModelForm):
 
 
 class SearchForm(forms.Form):
+
     GENRES_CHOICES = (
         (g['slug'], g['name']) for g in Genre.objects.all().values('slug', 'name')
-    )
+    ) if connection.introspection.table_names() else []
 
     MEDIA_TYPE_CHOICES = (
-        (mt['id'], mt['name']) for mt in
-        MediaType.objects.all().values('id', 'name')
-    )
+        (mt['id'], mt['name']) for mt in MediaType.objects.all().values('id', 'name')
+    ) if connection.introspection.table_names() else []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
