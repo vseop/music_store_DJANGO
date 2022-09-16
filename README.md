@@ -21,10 +21,11 @@ Model.objects.query if connection.introspection.table_names() else []
 
 ### Установка и запуск
 1) docker-compose up -d (запуск postgres в фоновом режиме)
-2) cd store && python manage.py makemigrations 
-3) python manage.py migrate
-4) python manage.py collectstatic
-5) python manage.py createsuperuser (создаем суперпользователя)
-6) python manage.py runserver
+2) pip install -r requirements.txt 
+3) cd store && python manage.py makemigrations 
+4) python manage.py migrate
+5) python manage.py collectstatic
+6) python manage.py createsuperuser (создаем суперпользователя)
+7) python manage.py runserver
 
 
